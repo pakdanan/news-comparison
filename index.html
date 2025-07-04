@@ -2,13 +2,13 @@
 <html lang="id" x-data="newsApp()" x-init class="bg-gray-100">
 <head>
   <meta charset="UTF-8">
-  <title>Cari Berita - GNews + Alpine + Tailwind</title>
+  <title>Cari Berita - NewsData.io + Alpine.js + Tailwind</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Alpine.js CDN -->
+  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -36,13 +36,13 @@
       </template>
 
       <div class="grid sm:grid-cols-2 gap-4 mt-4" x-show="articles.length > 0">
-        <template x-for="article in articles" :key="article.url">
+        <template x-for="article in articles" :key="article.link">
           <div class="bg-white rounded-lg shadow-md flex flex-col">
-            <img :src="article.image || 'https://via.placeholder.com/400x200'" alt="Gambar Berita" class="rounded-t-lg w-full h-48 object-cover">
+            <img :src="article.image_url || 'https://via.placeholder.com/400x200'" alt="Gambar Berita" class="rounded-t-lg w-full h-48 object-cover">
             <div class="p-4 flex flex-col flex-1">
               <h2 class="font-semibold text-lg mb-2" x-text="article.title"></h2>
               <p class="text-sm text-gray-700 flex-1" x-text="article.description || ''"></p>
-              <a :href="article.url" target="_blank"
+              <a :href="article.link" target="_blank"
                  class="mt-3 inline-block text-sm text-blue-600 hover:underline">Baca Selengkapnya</a>
             </div>
           </div>
@@ -63,7 +63,7 @@
         loading: false,
         error: '',
         searched: false,
-        apiKey: '17dea62e6bf35ad8378da9970fbaa9ae', // 🔑 Ganti dengan API Key GNews kamu
+        apiKey: 'pub_fa6d0f0e8b744853b994075676cc5418', // ← Ganti dengan API Key kamu
 
         async searchNews() {
           if (!this.keyword) return;
@@ -73,16 +73,17 @@
           this.searched = true;
 
           try {
-            const res = await fetch(`https://gnews.io/api/v4/search?q=${encodeURIComponent(this.keyword)}&lang=id&country=id&max=10&token=${this.apiKey}`);
+            const url = `https://newsdata.io/api/1/news?apikey=${this.apiKey}&q=${encodeURIComponent(this.keyword)}&country=id&language=id`;
+            const res = await fetch(url);
             const data = await res.json();
 
-            if (data.articles?.length) {
-              this.articles = data.articles;
+            if (data.results?.length > 0) {
+              this.articles = data.results;
             } else {
               this.articles = [];
             }
           } catch (e) {
-            this.error = 'Gagal mengambil berita. Periksa koneksi atau API key.';
+            this.error = 'Gagal mengambil data berita. Periksa koneksi atau API key.';
             console.error(e);
           } finally {
             this.loading = false;

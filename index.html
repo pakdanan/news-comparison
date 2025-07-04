@@ -60,7 +60,7 @@
                     <h3 class="font-semibold text-sm mb-1" x-text="item.title"></h3>
                     <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
                     <a :href="item.link" target="_blank"
-                       class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
+                       class="text-blue-500 text-sm hover:underline">🔗 Baca Selengkapnya</a>
                   </div>
                 </div>
               </template>
@@ -82,7 +82,7 @@
                 <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
                 <div class="text-xs text-gray-500 mt-1" x-text="'📍 ' + (item.source_id || 'Tidak diketahui')"></div>
                 <a :href="item.link" target="_blank"
-                   class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
+                   class="text-blue-500 text-sm hover:underline">🔗 Baca Selengkapnya</a>
               </div>
             </div>
           </template>

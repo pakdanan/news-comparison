@@ -25,7 +25,7 @@
 
       <div class="flex items-center gap-2">
         <input type="checkbox" x-model="isCompare" id="compareToggle" class="w-4 h-4 text-blue-600" />
-        <label for="compareToggle" class="text-sm text-gray-700">🔁 Kelompokkan berdasarkan sumber</label>
+        <label for="compareToggle" class="text-sm text-gray-700">🔁 Aktifkan Perbandingan (Kelompok berdasarkan sumber)</label>
       </div>
 
       <button @click="search"
@@ -104,4 +104,48 @@
       return {
         apiKey: '',
         keyword: '',
-        isCo
+        isCompare: false,
+        loading: false,
+        flatResults: [],
+        groupedResults: {},
+
+        async search() {
+          if (!this.apiKey || !this.keyword) return;
+
+          this.loading = true;
+          this.flatResults = [];
+          this.groupedResults = {};
+
+          const url = `https://newsdata.io/api/1/news?apikey=${this.apiKey}&q=${encodeURIComponent(this.keyword)}&country=id&language=id`;
+
+          try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (this.isCompare) {
+              const grouped = {};
+              (data.results || []).forEach(item => {
+                const source = item.source_id || "Tidak diketahui";
+                if (!grouped[source]) grouped[source] = [];
+                grouped[source].push(item);
+              });
+              this.groupedResults = grouped;
+            } else {
+              this.flatResults = data.results || [];
+            }
+
+          } catch (err) {
+            console.error("Gagal memuat data:", err);
+          } finally {
+            this.loading = false;
+          }
+        },
+
+        get hasAnyResult() {
+          return this.flatResults.length > 0 || Object.keys(this.groupedResults).length > 0;
+        }
+      };
+    }
+  </script>
+</body>
+</html>

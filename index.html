@@ -37,7 +37,7 @@
     </template>
 
     <!-- Hasil Pencarian -->
-    <div x-show="!loading && hasAnyResult" class="space-y-6">
+    <div x-show="!loading && hasAnyResult" x-transition.opacity class="space-y-6">
       
       <!-- Mode: Perbandingan -->
       <template x-if="isCompare">

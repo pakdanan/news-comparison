@@ -6,24 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="js/templates.js"></script>
+  <script defer src="js/news-service.js"></script>
+  <script defer src="js/app.js"></script>
 </head>
 <body class="min-h-screen p-4">
   <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-4" x-cloak>
     <h1 class="text-2xl font-bold text-center text-blue-700">📰 Portal Berita Indonesia</h1>
 
-    <!-- Form Input -->
     <div class="space-y-2">
       <input type="text" x-model="apiKey" placeholder="🔑 Masukkan API Key NewsData.io"
              class="w-full px-4 py-2 border rounded" />
       <input type="text" x-model="keyword" @keydown.enter="search"
              placeholder="🔍 Kata kunci (contoh: pemilu, ekonomi)" 
              class="w-full px-4 py-2 border rounded" />
-
       <div class="flex items-center gap-2">
         <input type="checkbox" x-model="isCompare" id="compareToggle" class="w-4 h-4 text-blue-600" />
-        <label for="compareToggle" class="text-sm text-gray-700">🔁 Aktifkan Perbandingan (Kelompok berdasarkan sumber)</label>
+        <label for="compareToggle" class="text-sm text-gray-700">🔁 Perbandingan antar sumber</label>
       </div>
-
       <button @click="search"
               :disabled="!apiKey || !keyword"
               class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">
@@ -31,15 +31,12 @@
       </button>
     </div>
 
-    <!-- Loading -->
     <template x-if="loading">
       <p class="text-center text-sm text-gray-500">🔄 Mengambil berita...</p>
     </template>
 
-    <!-- Hasil Pencarian -->
     <div x-show="!loading && hasAnyResult" class="space-y-6">
-
-      <!-- Mode: Perbandingan -->
+      <!-- Grouped view -->
       <template x-if="isCompare">
         <template x-for="[source, items] in Object.entries(groupedResults)" :key="source">
           <div>
@@ -51,119 +48,26 @@
             </div>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <template x-for="item in items" :key="item.link">
-                <div class="bg-gray-50 rounded shadow flex flex-col h-full">
-                  <template x-if="item.image_url">
-                    <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover rounded-t" />
-                  </template>
-                  <div class="p-3 flex flex-col flex-grow">
-                    <h3 class="font-semibold text-sm mb-1" x-text="item.title"></h3>
-                    <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
-                    <a :href="item.link" target="_blank"
-                       class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
-                  </div>
-                </div>
+                <template x-html="cardTemplate(item)"></template>
               </template>
             </div>
           </div>
         </template>
       </template>
 
-      <!-- Mode: Tanpa Perbandingan -->
+      <!-- Flat view -->
       <template x-if="!isCompare">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <template x-for="item in flatResults" :key="item.link">
-            <div class="bg-gray-50 rounded shadow flex flex-col h-full">
-              <template x-if="item.image_url">
-                <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover rounded-t" />
-              </template>
-              <div class="p-3 flex flex-col flex-grow">
-                <h3 class="font-semibold text-sm mb-1" x-text="item.title"></h3>
-                <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
-                
-                <!-- Ganti Pushpin dengan Logo -->
-                <div class="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                  <template x-if="item.source_icon">
-                    <img :src="item.source_icon" alt="logo" class="w-4 h-4 rounded" />
-                  </template>
-                  <span x-text="item.source_id || 'Tidak diketahui'"></span>
-                </div>
-
-                <a :href="item.link" target="_blank"
-                   class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
-              </div>
-            </div>
+            <template x-html="cardTemplate(item)"></template>
           </template>
         </div>
       </template>
     </div>
 
-    <!-- Tidak Ada Hasil -->
     <template x-if="!loading && keyword && !hasAnyResult">
       <p class="text-center text-sm text-gray-500 mt-4">😕 Tidak ada hasil ditemukan untuk "<span x-text="keyword"></span>"</p>
     </template>
   </div>
-
-  <!-- Alpine.js Logic -->
-  <script>
-    function newsApp() {
-      return {
-        apiKey: '',
-        keyword: '',
-        isCompare: false,
-        loading: false,
-        rawResults: [],
-        flatResults: [],
-        groupedResults: {},
-
-        init() {
-          this.$watch('isCompare', () => {
-            this.processResults();
-          });
-        },
-
-        async search() {
-          if (!this.apiKey || !this.keyword) return;
-
-          this.loading = true;
-          this.rawResults = [];
-          this.flatResults = [];
-          this.groupedResults = {};
-
-          const url = `https://newsdata.io/api/1/news?apikey=${this.apiKey}&q=${encodeURIComponent(this.keyword)}&country=id&language=id`;
-
-          try {
-            const res = await fetch(url);
-            const data = await res.json();
-            this.rawResults = data.results || [];
-            this.processResults();
-          } catch (err) {
-            console.error("Gagal memuat data:", err);
-          } finally {
-            this.loading = false;
-          }
-        },
-
-        processResults() {
-          this.flatResults = [];
-          this.groupedResults = {};
-          if (this.isCompare) {
-            const grouped = {};
-            this.rawResults.forEach(item => {
-              const source = item.source_id || "Tidak diketahui";
-              if (!grouped[source]) grouped[source] = [];
-              grouped[source].push(item);
-            });
-            this.groupedResults = grouped;
-          } else {
-            this.flatResults = this.rawResults;
-          }
-        },
-
-        get hasAnyResult() {
-          return this.flatResults.length > 0 || Object.keys(this.groupedResults).length > 0;
-        }
-      };
-    }
-  </script>
 </body>
 </html>

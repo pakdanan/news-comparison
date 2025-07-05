@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <title>Berita Indonesia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-screen p-4">
@@ -40,6 +38,7 @@
 
     <!-- Hasil Pencarian -->
     <div x-show="!loading && hasAnyResult" class="space-y-6">
+      
       <!-- Mode: Perbandingan -->
       <template x-if="isCompare">
         <template x-for="[source, items] in Object.entries(groupedResults)" :key="source">
@@ -52,15 +51,15 @@
             </div>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <template x-for="item in items" :key="item.link">
-                <div class="bg-gray-50 rounded shadow overflow-hidden">
+                <div class="bg-gray-50 rounded shadow flex flex-col h-full">
                   <template x-if="item.image_url">
-                    <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover">
+                    <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover rounded-t" />
                   </template>
-                  <div class="p-3 flex flex-col h-full">
+                  <div class="p-3 flex flex-col flex-grow">
                     <h3 class="font-semibold text-sm mb-1" x-text="item.title"></h3>
                     <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
                     <a :href="item.link" target="_blank"
-                       class="text-blue-500 text-sm hover:underline">🔗 Baca Selengkapnya</a>
+                       class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
                   </div>
                 </div>
               </template>
@@ -73,16 +72,16 @@
       <template x-if="!isCompare">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <template x-for="item in flatResults" :key="item.link">
-            <div class="bg-gray-50 rounded shadow overflow-hidden">
+            <div class="bg-gray-50 rounded shadow flex flex-col h-full">
               <template x-if="item.image_url">
-                <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover">
+                <img :src="item.image_url" alt="thumbnail" class="w-full h-40 object-cover rounded-t" />
               </template>
-              <div class="p-3 flex flex-col h-full">
+              <div class="p-3 flex flex-col flex-grow">
                 <h3 class="font-semibold text-sm mb-1" x-text="item.title"></h3>
                 <p class="text-xs text-gray-600 flex-grow" x-text="item.description || 'Tidak ada ringkasan.'"></p>
                 <div class="text-xs text-gray-500 mt-1" x-text="'📍 ' + (item.source_id || 'Tidak diketahui')"></div>
                 <a :href="item.link" target="_blank"
-                   class="text-blue-500 text-sm hover:underline">🔗 Baca Selengkapnya</a>
+                   class="text-blue-600 text-sm mt-2 hover:underline font-medium">🔗 Baca Selengkapnya</a>
               </div>
             </div>
           </template>

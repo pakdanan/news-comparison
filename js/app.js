@@ -7,6 +7,7 @@ function newsApp() {
     rawResults: [],
     flatResults: [],
     groupedResults: {},
+    cardTemplate, 
 
     init() {
       this.$watch('isCompare', () => this.processResults());
@@ -44,6 +45,5 @@ function newsApp() {
       return this.flatResults.length > 0 || Object.keys(this.groupedResults).length > 0;
     },
 
-    cardTemplate
   };
 }

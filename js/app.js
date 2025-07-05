@@ -7,7 +7,7 @@ function newsApp() {
     rawResults: [],
     flatResults: [],
     groupedResults: {},
-    cardTemplate, 
+    cardTemplate, // pastikan fungsi ini ada di templates.js
 
     init() {
       this.$watch('isCompare', () => this.processResults());
@@ -43,9 +43,11 @@ function newsApp() {
 
     get hasAnyResult() {
       return this.flatResults.length > 0 || Object.keys(this.groupedResults).length > 0;
-    },
-
+    }
   };
-  console.log("✅ newsApp tersedia", typeof newsApp);
-
 }
+
+// ⛳️ PENTING: attach ke window agar bisa diakses di HTML
+window.newsApp = newsApp;
+console.log("✅ app.js loaded");
+console.log("window.newsApp:", typeof window.newsApp);

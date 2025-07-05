@@ -33,7 +33,14 @@
     <div x-text="`Total artikel: ${flatResults.length + Object.values(groupedResults).flat().length}`" class="text-xs text-gray-500"></div>
 
     <!-- Hasil -->
-    <div x-show="!loading && hasAnyResult" class="space-y-6">
+    <div x-show="!loading && hasAnyResult"
+       x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
+    class="space-y-6">
       <!-- Mode: Perbandingan -->
       <template x-if="isCompare">
         <template x-for="[source, items] in Object.entries(groupedResults)" :key="source">

@@ -19,7 +19,7 @@
       <input type="text" x-model="keyword" @keydown.enter="search" placeholder="🔍 Kata kunci" class="w-full px-4 py-2 border rounded" />
       <div class="flex items-center gap-2">
         <input type="checkbox" x-model="isCompare" id="compareToggle" class="w-4 h-4 text-blue-600" />
-        <label for="compareToggle" class="text-sm text-gray-700">🔁 Perbandingan antar sumber</label>
+        <label for="compareToggle" class="text-sm text-gray-700">🔁 Kelompokkan berdasarkan sumber</label>
       </div>
       <button @click="search" :disabled="!apiKey || !keyword" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400">Cari</button>
     </div>

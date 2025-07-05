@@ -103,13 +103,21 @@
         keyword: '',
         isCompare: false,
         loading: false,
+        rawResults: [],
         flatResults: [],
         groupedResults: {},
+
+        init() {
+          this.$watch('isCompare', () => {
+            this.processResults();
+          });
+        },
 
         async search() {
           if (!this.apiKey || !this.keyword) return;
 
           this.loading = true;
+          this.rawResults = [];
           this.flatResults = [];
           this.groupedResults = {};
 
@@ -118,23 +126,28 @@
           try {
             const res = await fetch(url);
             const data = await res.json();
-
-            if (this.isCompare) {
-              const grouped = {};
-              (data.results || []).forEach(item => {
-                const source = item.source_id || "Tidak diketahui";
-                if (!grouped[source]) grouped[source] = [];
-                grouped[source].push(item);
-              });
-              this.groupedResults = grouped;
-            } else {
-              this.flatResults = data.results || [];
-            }
-
+            this.rawResults = data.results || [];
+            this.processResults();
           } catch (err) {
             console.error("Gagal memuat data:", err);
           } finally {
             this.loading = false;
+          }
+        },
+
+        processResults() {
+          this.flatResults = [];
+          this.groupedResults = {};
+          if (this.isCompare) {
+            const grouped = {};
+            this.rawResults.forEach(item => {
+              const source = item.source_id || "Tidak diketahui";
+              if (!grouped[source]) grouped[source] = [];
+              grouped[source].push(item);
+            });
+            this.groupedResults = grouped;
+          } else {
+            this.flatResults = this.rawResults;
           }
         },
 

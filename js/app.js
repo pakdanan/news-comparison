@@ -46,4 +46,6 @@ function newsApp() {
     },
 
   };
+  console.log("✅ newsApp tersedia", typeof newsApp);
+
 }

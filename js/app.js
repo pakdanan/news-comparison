@@ -23,6 +23,7 @@ function newsApp() {
 
       try {
         this.rawResults = await fetchNews(this.apiKey, this.keyword);
+        console.log("Raw results:", this.rawResults);
         this.processResults();
       } catch (err) {
         console.error("Gagal memuat data:", err);
